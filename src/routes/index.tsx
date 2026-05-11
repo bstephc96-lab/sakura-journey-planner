@@ -6,6 +6,7 @@ import stopHakone from "@/assets/stop-hakone.jpg";
 import stopKyoto from "@/assets/stop-kyoto.jpg";
 import stopOsaka from "@/assets/stop-osaka.jpg";
 import { Chatroom } from "@/components/Chatroom";
+import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight, Search, ShoppingCart, Send } from "lucide-react";
@@ -280,6 +281,14 @@ function Index() {
             </div>
           ))}
         </div>
+
+        {/* CURRENCY */}
+        <Section id="currency" eyebrow="Money" title="Yen → KYD converter">
+          <p className="-mt-4 mb-8 max-w-2xl text-base text-ink/75">
+            Live rate from open.er-api.com. Tap the arrows to flip between Japanese Yen and Cayman Islands Dollar.
+          </p>
+        </Section>
+        <CurrencyConverter />
 
         {/* TIKTOKS */}
         <Section eyebrow="Inspiration" title="Saved from TikTok" />
