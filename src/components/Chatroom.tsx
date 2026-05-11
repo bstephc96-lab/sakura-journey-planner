@@ -79,21 +79,23 @@ export function Chatroom() {
   };
 
   return (
-    <div className="rounded-3xl border-2 border-sakura/40 bg-white/70 p-6 shadow-[var(--shadow-petal)] backdrop-blur">
+    <div className="grid gap-8 lg:grid-cols-[1.4fr,1fr]">
       <div
         ref={scrollRef}
-        className="mb-4 h-80 space-y-3 overflow-y-auto rounded-2xl bg-gradient-to-b from-sakura/10 to-white p-4"
+        className="h-[480px] space-y-4 overflow-y-auto border border-border bg-muted p-6"
       >
         {messages.length === 0 && (
-          <p className="pt-24 text-center font-hand text-2xl text-muted-foreground">
-            Be the first to drop an idea ✨
+          <p className="pt-32 text-center font-display text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            Be the first to drop an idea
           </p>
         )}
         {messages.map((m) => (
-          <div key={m.id} className="rounded-2xl bg-white p-3 shadow-sm">
+          <div key={m.id} className="border-l-2 border-sakura-deep bg-background p-4">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="font-display font-bold text-sakura-deep">{m.nickname}</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="font-display text-sm font-bold uppercase tracking-wide">
+                {m.nickname}
+              </span>
+              <span className="font-display text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 {new Date(m.created_at).toLocaleString(undefined, {
                   month: "short",
                   day: "numeric",
@@ -102,31 +104,44 @@ export function Chatroom() {
                 })}
               </span>
             </div>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-ink">{m.message}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm text-ink/85">{m.message}</p>
           </div>
         ))}
       </div>
-      <form onSubmit={send} className="space-y-2">
-        <Input
-          placeholder="Your nickname"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          maxLength={40}
-          className="bg-white"
-        />
-        <div className="flex gap-2">
+
+      <form onSubmit={send} className="space-y-4 self-start border border-border bg-sakura p-6">
+        <div>
+          <label className="font-display text-[10px] font-bold uppercase tracking-widest text-ink/70">
+            Your nickname
+          </label>
+          <Input
+            placeholder="e.g. Sasha"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            maxLength={40}
+            className="mt-1 rounded-none border-ink/20 bg-background"
+          />
+        </div>
+        <div>
+          <label className="font-display text-[10px] font-bold uppercase tracking-widest text-ink/70">
+            Your idea
+          </label>
           <Textarea
-            placeholder="Share an idea, a tip, a must-eat..."
+            placeholder="Share a tip, restaurant, hidden gem..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={500}
-            rows={2}
-            className="bg-white"
+            rows={5}
+            className="mt-1 rounded-none border-ink/20 bg-background"
           />
-          <Button type="submit" disabled={sending} className="h-auto self-stretch px-5">
-            <Send className="h-4 w-4" />
-          </Button>
         </div>
+        <Button
+          type="submit"
+          disabled={sending}
+          className="w-full rounded-none bg-ink font-display text-xs font-bold uppercase tracking-widest text-background hover:bg-ink/85"
+        >
+          <Send className="mr-2 h-4 w-4" /> Post idea
+        </Button>
       </form>
     </div>
   );
