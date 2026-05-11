@@ -64,8 +64,8 @@
   --color-sakura-deep: var(--sakura-deep);
   --color-matcha: var(--matcha);
   --color-ink: var(--ink);
-  --font-display: "Shippori Mincho", serif;
-  --font-hand: "Caveat", cursive;
+  --font-display: "Cormorant Garamond", serif;
+  --font-hand: "JetBrains Mono", monospace;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
