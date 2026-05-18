@@ -1,18 +1,650 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sakura Days — Our 2-Week Japan Trip</title>
-    <meta
-      name="description"
-      content="A 2-week cherry blossom Japan itinerary: Tokyo, Kyoto, Osaka. Checklist, shopping guide, booking timeline, maps and a live ideas board."
-    />
-    <meta property="og:title" content="Sakura Days — Our 2-Week Japan Trip" />
-    <meta property="og:type" content="website" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sakura Days — Our 2-Week Japan Trip</title>
+  <meta name="description" content="A 2-week cherry blossom Japan itinerary: Tokyo, Hakone, Kyoto, Osaka. Checklist, shopping guide, booking timeline, currency converter and a live ideas board." />
+  <meta property="og:title" content="Sakura Days — Our 2-Week Japan Trip" />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       DESIGN TOKENS — match the React app's sakura palette
+       ========================================================= */
+    :root {
+      --bg: #ffffff;
+      --surface: #f7f6f3;
+      --ink: #1a1c25;
+      --muted: #6a6f7d;
+      --border: #e4e3df;
+      --sakura: #f6dce6;
+      --sakura-deep: #4e6bd4;
+      --matcha: #6aa07a;
+      --shadow-petal: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px -8px rgba(0,0,0,.08);
+      --font-display: "Archivo", system-ui, sans-serif;
+      --font-sans: "Inter", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .eyebrow { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: var(--sakura-deep); }
+    .h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(32px, 5vw, 52px); text-transform: uppercase; letter-spacing: -.02em; margin: 8px 0 0; line-height: 1; }
+    .section { margin-top: 96px; scroll-margin-top: 80px; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; gap: 24px; }
+
+    /* =========================================================
+       PETALS — animated background
+       ========================================================= */
+    @keyframes float-petal {
+      0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: .8; }
+      100% { transform: translateY(110vh) translateX(40px) rotate(360deg); opacity: 0; }
+    }
+    .petals-field { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+    .petal { position: absolute; top: 0; width: 14px; height: 14px;
+      background: radial-gradient(circle at 30% 30%, var(--sakura), var(--sakura-deep));
+      border-radius: 150% 0 150% 0;
+      animation: float-petal linear infinite;
+    }
+
+    /* =========================================================
+       NAV
+       ========================================================= */
+    .nav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 50%; background: var(--sakura-deep); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 12px; }
+    .brand-name { font-family: var(--font-display); font-weight: 900; letter-spacing: -.01em; }
+    .nav-links { display: none; gap: 32px; }
+    .nav-links a { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--sakura-deep); }
+    .nav-cta { background: var(--ink); color: #fff; padding: 9px 18px; border-radius: 999px; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    @media (min-width: 880px) { .nav-links { display: flex; } }
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+    .hero { position: relative; height: 88vh; min-height: 600px; overflow: hidden; }
+    .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hero-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,.1), transparent); }
+    .hero-inner { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding: 0 24px 64px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; color: #fff; }
+    .hero-eyebrow { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    .hero-title { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; line-height: .95; letter-spacing: -.02em; font-size: clamp(48px, 9vw, 120px); margin: 12px 0 0; max-width: 900px; }
+    .hero-card { background: var(--sakura); color: var(--ink); padding: 24px; max-width: 520px; margin-top: 32px; box-shadow: var(--shadow-petal); }
+    .hero-card p { margin: 0; font-size: 16px; line-height: 1.55; }
+    .hero-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; padding: 12px 18px; margin-top: 20px; font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* =========================================================
+       ITINERARY
+       ========================================================= */
+    .stops { display: grid; gap: 48px 24px; }
+    .stop-img { position: relative; aspect-ratio: 4/3; background: var(--surface); overflow: hidden; }
+    .stop-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s; }
+    .stop:hover .stop-img img { transform: scale(1.05); }
+    .stop-num { position: absolute; top: 14px; left: 14px; background: #fff; padding: 4px 10px; font-family: var(--font-display); font-weight: 900; font-size: 11px; letter-spacing: .15em; }
+    .stop-meta { font-family: var(--font-display); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); margin-top: 16px; }
+    .stop-title { font-family: var(--font-display); font-weight: 900; font-size: clamp(28px, 4vw, 40px); text-transform: uppercase; letter-spacing: -.02em; margin: 4px 0 0; line-height: 1; }
+    .stop-blurb { margin-top: 8px; font-size: 14px; color: rgba(26,28,37,.8); max-width: 420px; }
+    @media (min-width: 760px) { .stops { grid-template-columns: 1fr 1fr; } }
+
+    /* =========================================================
+       MUST-SEE LIST
+       ========================================================= */
+    .mustsee { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: grid; }
+    .mustsee-row { display: flex; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+    .mustsee-row:last-child { border-bottom: 0; }
+    .mustsee-num { font-family: var(--font-display); font-weight: 900; font-size: 26px; color: var(--sakura-deep); }
+    .mustsee-name { font-family: var(--font-display); font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: -.01em; margin: 0; }
+    .mustsee-city { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+    .mustsee-why { font-size: 14px; color: rgba(26,28,37,.8); margin-top: 8px; }
+    @media (min-width: 760px) {
+      .mustsee { grid-template-columns: 1fr 1fr; column-gap: 32px; }
+      .mustsee-row { border-bottom: 1px solid var(--border); }
+      .mustsee-row:nth-last-child(-n+2) { border-bottom: 0; }
+    }
+
+    /* =========================================================
+       MAP
+       ========================================================= */
+    .map-frame { border: 1px solid var(--border); overflow: hidden; }
+    .map-frame iframe { width: 100%; height: 480px; border: 0; display: block; }
+
+    /* =========================================================
+       PLAN: timeline + checklist
+       ========================================================= */
+    .plan { display: grid; gap: 48px; }
+    @media (min-width: 960px) { .plan { grid-template-columns: 1fr 1fr; gap: 64px; } }
+    .timeline { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+    .timeline li { display: flex; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+    .timeline .when { width: 128px; flex-shrink: 0; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--sakura-deep); }
+    .timeline .task { font-size: 14px; line-height: 1.55; color: rgba(26,28,37,.85); }
+
+    .checklist-title { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .checklist-grid { display: grid; gap: 6px; margin-top: 14px; }
+    @media (min-width: 480px) { .checklist-grid { grid-template-columns: 1fr 1fr; gap: 6px 16px; } }
+    .checklist-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; cursor: pointer; transition: color .2s; }
+    .checklist-item:hover { color: var(--sakura-deep); }
+    .checklist-item input { accent-color: var(--sakura-deep); width: 16px; height: 16px; }
+    .checklist-item.done span { color: var(--muted); text-decoration: line-through; }
+
+    /* =========================================================
+       SHOPPING
+       ========================================================= */
+    .shop-grid { display: grid; gap: 40px 24px; }
+    @media (min-width: 640px) { .shop-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1000px) { .shop-grid { grid-template-columns: repeat(3, 1fr); } }
+    .shop-card { border-top: 2px solid var(--ink); padding-top: 16px; }
+    .shop-cat-meta { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .shop-cat { font-family: var(--font-display); font-weight: 900; font-size: 24px; text-transform: uppercase; letter-spacing: -.01em; margin: 4px 0 0; }
+    .shop-list { list-style: none; padding: 0; margin: 12px 0 0; }
+    .shop-list li { display: flex; gap: 10px; font-size: 14px; padding: 3px 0; color: rgba(26,28,37,.85); }
+    .shop-list li::before { content: ""; display: inline-block; width: 4px; height: 4px; background: var(--sakura-deep); margin-top: 9px; flex-shrink: 0; }
+
+    /* =========================================================
+       CURRENCY
+       ========================================================= */
+    .currency { border: 1px solid var(--border); padding: 28px; background: var(--surface); }
+    .currency-row { display: grid; gap: 12px; align-items: end; }
+    @media (min-width: 640px) { .currency-row { grid-template-columns: 1fr auto 1fr; } }
+    .currency-field label { display: block; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .currency-input { display: flex; align-items: center; background: #fff; border: 1px solid var(--border); padding: 12px 14px; }
+    .currency-input input { border: 0; outline: 0; flex: 1; font-size: 22px; font-family: var(--font-display); font-weight: 700; background: transparent; min-width: 0; }
+    .currency-input span { font-family: var(--font-display); font-weight: 700; color: var(--muted); margin-left: 8px; }
+    .currency-swap { background: var(--ink); color: #fff; border: 0; padding: 14px 16px; border-radius: 4px; font-size: 18px; }
+    .currency-rate { margin-top: 14px; font-size: 12px; color: var(--muted); }
+
+    /* =========================================================
+       CHAT / IDEAS
+       ========================================================= */
+    .chat { border: 1px solid var(--border); }
+    .chat-list { max-height: 420px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .chat-msg { background: var(--surface); padding: 14px 16px; border-left: 3px solid var(--sakura-deep); }
+    .chat-msg-head { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-family: var(--font-display); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+    .chat-msg-body { font-size: 14px; line-height: 1.5; }
+    .chat-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 40px 0; }
+    .chat-form { display: grid; gap: 10px; padding: 16px; border-top: 1px solid var(--border); background: var(--surface); }
+    @media (min-width: 640px) { .chat-form { grid-template-columns: 200px 1fr auto; } }
+    .chat-form input, .chat-form textarea { border: 1px solid var(--border); padding: 10px 12px; font: inherit; background: #fff; resize: none; }
+    .chat-form button { background: var(--ink); color: #fff; border: 0; padding: 10px 20px; font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+    footer { margin-top: 128px; background: var(--surface); border-top: 1px solid var(--border); }
+    .footer-grid { display: grid; gap: 32px; padding: 64px 0; }
+    @media (min-width: 760px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
+    .footer-grid h4 { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; margin: 0 0 12px; }
+    .footer-grid ul { list-style: none; padding: 0; margin: 0; }
+    .footer-grid li { font-size: 14px; padding: 4px 0; }
+    .footer-grid a:hover { color: var(--sakura-deep); }
+    .footer-end { border-top: 1px solid var(--border); text-align: center; padding: 24px; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <!-- Declarative component mounts — every visual is referenced from this file -->
+  <div data-component="petals" data-props='{"count":18}'></div>
+
+  <header class="nav" data-component="navbar"></header>
+
+  <main>
+    <section data-component="hero"></section>
+
+    <div class="wrap">
+      <section id="itinerary" class="section" data-component="itinerary"></section>
+      <section id="spots"     class="section" data-component="mustsee"></section>
+      <section id="map"       class="section" data-component="mapEmbed"></section>
+      <section id="plan"      class="section" data-component="plan"></section>
+      <section id="shop"      class="section" data-component="shop"></section>
+      <section id="currency"  class="section" data-component="currency"></section>
+      <section id="ideas"     class="section" data-component="chat"></section>
+    </div>
+  </main>
+
+  <footer data-component="siteFooter"></footer>
+
+  <!-- =========================================================
+       OBJECT-ORIENTED RUNTIME
+       Each visual is a class. The Registry wires DOM mount-points
+       (data-component="name") to a class. Add a class, register it,
+       drop a <div data-component="name"></div> in the markup.
+       ========================================================= -->
+  <script>
+  (() => {
+    "use strict";
+
+    // ---- DATA ------------------------------------------------------------
+    const HERO_IMG = "https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=2000&q=80";
+    const STOP_IMGS = {
+      tokyo:  "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
+      hakone: "https://images.unsplash.com/photo-1578469645742-46cae010e5d4?auto=format&fit=crop&w=1200&q=80",
+      kyoto:  "https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?auto=format&fit=crop&w=1200&q=80",
+      osaka:  "https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=1200&q=80",
+    };
+
+    const DATA = {
+      googleDoc: "https://docs.google.com/document/d/REPLACE_WITH_YOUR_DOC_ID/edit",
+      navLinks: ["Itinerary","Spots","Map","Plan","Shop","Ideas"],
+      stops: [
+        { num:"01", days:"Day 1–5",   city:"Tokyo",  img:STOP_IMGS.tokyo,  blurb:"Shibuya, Shinjuku, Asakusa, teamLab, Meguro River blossoms at night." },
+        { num:"02", days:"Day 6",     city:"Hakone", img:STOP_IMGS.hakone, blurb:"Onsen + Mt. Fuji views. Easy day trip from Tokyo by Romancecar." },
+        { num:"03", days:"Day 7–11",  city:"Kyoto",  img:STOP_IMGS.kyoto,  blurb:"Fushimi Inari at dawn, Arashiyama bamboo, Philosopher's Path, Gion." },
+        { num:"04", days:"Day 12–13", city:"Osaka",  img:STOP_IMGS.osaka,  blurb:"Dotonbori street food, Osaka Castle gardens, day trip to Nara." },
+      ],
+      mustSee: [
+        { name:"Meguro River",       city:"Tokyo", why:"Pink tunnel of sakura at night with lanterns" },
+        { name:"Shinjuku Gyoen",     city:"Tokyo", why:"1,000+ cherry trees, late-blooming varieties" },
+        { name:"Philosopher's Path", city:"Kyoto", why:"2km canal lined with sakura" },
+        { name:"Maruyama Park",      city:"Kyoto", why:"Iconic weeping cherry, hanami picnics" },
+        { name:"Osaka Castle Park",  city:"Osaka", why:"300+ cherry trees, castle backdrop" },
+        { name:"Mt. Yoshino",        city:"Nara",  why:"30,000 trees blooming up the mountainside" },
+      ],
+      checklist: [
+        "Passport (valid 6+ months)","Visa check (most don't need one)","JR Pass voucher","Pocket WiFi or eSIM",
+        "Suica / Pasmo IC card","Universal power adapter (Type A)","Comfy walking shoes","Light layers + warm jacket",
+        "Compact umbrella","Reusable tote","¥30k cash starter","Credit card with no FX fee",
+        "Allergy translation card","Picnic blanket for hanami",
+      ],
+      shopping: [
+        { cat:"Skincare & Beauty", picks:["Hada Labo Gokujyun","Shiseido Senka","Canmake","DHC cleansing oil"] },
+        { cat:"Snacks",            picks:["Tokyo Banana","KitKats (matcha, sake, hojicha)","Royce' chocolate","Calbee Jagariko"] },
+        { cat:"Stationery",        picks:["Itoya Ginza","Tokyu Hands","Loft","Pilot & Uni-ball pens"] },
+        { cat:"Fashion",           picks:["Uniqlo & GU flagships","BEAMS","Harajuku vintage (Ragtag)","Don Quijote"] },
+        { cat:"Souvenirs",         picks:["Furoshiki cloth","Yunomi tea cups","Daruma doll","Handmade chopsticks"] },
+      ],
+      timeline: [
+        { when:"6 months out", task:"Book international flights — sakura fares spike fast" },
+        { when:"5 months out", task:"Reserve hotels in Kyoto first; they sell out earliest" },
+        { when:"4 months out", task:"Book teamLab Planets, Ghibli Museum, Robot Cabaret" },
+        { when:"3 months out", task:"Reserve Shinkansen seats once JR opens (30 days prior)" },
+        { when:"2 months out", task:"Buy travel insurance + JR Pass voucher if using one" },
+        { when:"1 month out",  task:"Order pocket WiFi / activate eSIM, exchange a bit of yen" },
+        { when:"1 week out",   task:"Download Maps offline, Translate JP pack, check sakura forecast" },
+      ],
+    };
+
+    // ---- TINY DOM HELPERS ------------------------------------------------
+    const h = (tag, attrs = {}, ...children) => {
+      const el = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs || {})) {
+        if (v == null || v === false) continue;
+        if (k === "class") el.className = v;
+        else if (k === "html") el.innerHTML = v;
+        else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2).toLowerCase(), v);
+        else el.setAttribute(k, v === true ? "" : v);
+      }
+      for (const c of children.flat()) {
+        if (c == null || c === false) continue;
+        el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+      }
+      return el;
+    };
+    const sectionHead = (eyebrow, title) =>
+      h("div", { class: "section-head" },
+        h("div", {},
+          h("p", { class: "eyebrow" }, eyebrow),
+          h("h2", { class: "h2" }, title)
+        )
+      );
+
+    // ---- BASE COMPONENT --------------------------------------------------
+    class Component {
+      constructor(el, props = {}) { this.el = el; this.props = props; }
+      mount() { /* override */ }
+    }
+
+    // ---- COMPONENTS ------------------------------------------------------
+    class PetalsField extends Component {
+      mount() {
+        const count = this.props.count || 18;
+        const field = h("div", { class: "petals-field" });
+        for (let i = 0; i < count; i++) {
+          field.appendChild(h("span", {
+            class: "petal",
+            style: `left:${(i*100)/count + Math.random()*5}%;
+                    animation-duration:${10 + Math.random()*12}s;
+                    animation-delay:${-Math.random()*15}s;
+                    transform:scale(${0.6 + Math.random()});`
+          }));
+        }
+        this.el.replaceWith(field);
+      }
+    }
+
+    class NavBar extends Component {
+      mount() {
+        this.el.appendChild(h("div", { class: "wrap nav-inner" },
+          h("a", { href: "#", class: "brand" },
+            h("span", { class: "brand-mark" }, "桜"),
+            h("span", { class: "brand-name" }, "SAKURA DAYS")
+          ),
+          h("nav", { class: "nav-links" },
+            ...DATA.navLinks.map(l => h("a", { href: `#${l.toLowerCase()}` }, l))
+          ),
+          h("a", { href: DATA.googleDoc, target: "_blank", rel: "noopener", class: "nav-cta" }, "Open Doc")
+        ));
+      }
+    }
+
+    class Hero extends Component {
+      mount() {
+        this.el.className = "hero";
+        this.el.appendChild(h("img", { src: HERO_IMG, alt: "Cherry blossoms at night" }));
+        this.el.appendChild(h("div", { class: "hero-grad" }));
+        this.el.appendChild(h("div", { class: "hero-inner" },
+          h("p", { class: "hero-eyebrow" }, "Spring 2026"),
+          h("h1", { class: "hero-title", html: "We know<br>where to go" }),
+          h("div", { class: "hero-card" },
+            h("p", {}, "Two weeks chasing cherry blossoms across Tokyo, Hakone, Kyoto and Osaka. The full plan — from must-see hanami spots to when to book your Shinkansen seat."),
+            h("a", { href: "#itinerary", class: "hero-cta" }, "See the itinerary →")
+          )
+        ));
+      }
+    }
+
+    class Itinerary extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("The Route", "Four stops, two weeks"));
+        const grid = h("div", { class: "stops" });
+        DATA.stops.forEach(s => {
+          grid.appendChild(h("article", { class: "stop" },
+            h("div", { class: "stop-img" },
+              h("img", { src: s.img, alt: s.city, loading: "lazy" }),
+              h("span", { class: "stop-num" }, s.num)
+            ),
+            h("p", { class: "stop-meta" }, s.days),
+            h("h3", { class: "stop-title" }, s.city),
+            h("p", { class: "stop-blurb" }, s.blurb),
+          ));
+        });
+        this.el.appendChild(grid);
+      }
+    }
+
+    class MustSee extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("Hanami Bucket List", "Best cherry blossom spots"));
+        const grid = h("div", { class: "mustsee" });
+        DATA.mustSee.forEach((s, i) => {
+          grid.appendChild(h("div", { class: "mustsee-row" },
+            h("span", { class: "mustsee-num" }, `0${i+1}`),
+            h("div", { style: "flex:1" },
+              h("h4", { class: "mustsee-name" }, s.name),
+              h("p", { class: "mustsee-city" }, s.city),
+              h("p", { class: "mustsee-why" }, s.why),
+            )
+          ));
+        });
+        this.el.appendChild(grid);
+      }
+    }
+
+    class MapEmbed extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("On the Ground", "Where we'll be"));
+        this.el.appendChild(h("div", { class: "map-frame" },
+          h("iframe", {
+            title: "Japan trip map",
+            src: "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d6614085.7!2d136.5!3d36.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1700000000000",
+            loading: "lazy",
+          })
+        ));
+      }
+    }
+
+    class Plan extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("Get Ready", "When to book what"));
+        const grid = h("div", { class: "plan" });
+
+        const ol = h("ol", { class: "timeline" });
+        DATA.timeline.forEach(t => ol.appendChild(
+          h("li", {},
+            h("span", { class: "when" }, t.when),
+            h("p", { class: "task" }, t.task),
+          )
+        ));
+
+        const box = h("div", {},
+          h("h3", { class: "checklist-title" }, "Packing checklist"),
+        );
+        const cl = h("div", { class: "checklist-grid" });
+        const saved = JSON.parse(localStorage.getItem("sakura.checklist") || "{}");
+        DATA.checklist.forEach(item => {
+          const id = "ck-" + btoa(unescape(encodeURIComponent(item))).replace(/=/g,"");
+          const checked = !!saved[item];
+          const lbl = h("label", { class: "checklist-item" + (checked ? " done" : ""), for: id });
+          const box2 = h("input", { type: "checkbox", id });
+          box2.checked = checked;
+          box2.addEventListener("change", () => {
+            saved[item] = box2.checked;
+            localStorage.setItem("sakura.checklist", JSON.stringify(saved));
+            lbl.classList.toggle("done", box2.checked);
+          });
+          lbl.appendChild(box2);
+          lbl.appendChild(h("span", {}, item));
+          cl.appendChild(lbl);
+        });
+        box.appendChild(cl);
+
+        grid.appendChild(ol);
+        grid.appendChild(box);
+        this.el.appendChild(grid);
+      }
+    }
+
+    class Shop extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("Bring it home", "Shopping guide"));
+        const grid = h("div", { class: "shop-grid" });
+        DATA.shopping.forEach((s, i) => {
+          const ul = h("ul", { class: "shop-list" });
+          s.picks.forEach(p => ul.appendChild(h("li", {}, p)));
+          grid.appendChild(h("div", { class: "shop-card" },
+            h("p", { class: "shop-cat-meta" }, `0${i+1} / Category`),
+            h("h4", { class: "shop-cat" }, s.cat),
+            ul
+          ));
+        });
+        this.el.appendChild(grid);
+      }
+    }
+
+    class Currency extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("Money", "Yen → KYD converter"));
+        const fromInput = h("input", { type: "number", value: "10000", min: "0" });
+        const toInput   = h("input", { type: "number", value: "0", min: "0" });
+        const fromCode  = h("span", {}, "JPY");
+        const toCode    = h("span", {}, "KYD");
+        const rateLine  = h("p", { class: "currency-rate" }, "Loading live rate…");
+        let rate = null;          // toCode per fromCode
+        let direction = "JPY→KYD";
+
+        const swap = h("button", { class: "currency-swap", title: "Swap" }, "⇄");
+
+        const box = h("div", { class: "currency" },
+          h("div", { class: "currency-row" },
+            h("div", { class: "currency-field" },
+              h("label", {}, "From"),
+              h("div", { class: "currency-input" }, fromInput, fromCode)
+            ),
+            swap,
+            h("div", { class: "currency-field" },
+              h("label", {}, "To"),
+              h("div", { class: "currency-input" }, toInput, toCode)
+            ),
+          ),
+          rateLine
+        );
+
+        const fetchRate = async () => {
+          try {
+            const base = fromCode.textContent;
+            const target = toCode.textContent;
+            const res = await fetch(`https://open.er-api.com/v6/latest/${base}`);
+            const j = await res.json();
+            rate = j.rates?.[target] ?? null;
+            if (rate != null) {
+              rateLine.textContent = `1 ${base} = ${rate.toFixed(4)} ${target}  ·  updated ${new Date().toLocaleDateString()}`;
+              recalc("from");
+            } else {
+              rateLine.textContent = "Rate unavailable.";
+            }
+          } catch {
+            rateLine.textContent = "Couldn't load live rate (offline?).";
+          }
+        };
+        const recalc = (driver) => {
+          if (rate == null) return;
+          if (driver === "from") toInput.value = (Number(fromInput.value || 0) * rate).toFixed(2);
+          else fromInput.value = (Number(toInput.value || 0) / rate).toFixed(2);
+        };
+        fromInput.addEventListener("input", () => recalc("from"));
+        toInput.addEventListener("input",   () => recalc("to"));
+        swap.addEventListener("click", () => {
+          const a = fromCode.textContent, b = toCode.textContent;
+          fromCode.textContent = b; toCode.textContent = a;
+          direction = `${b}→${a}`;
+          fetchRate();
+        });
+
+        this.el.appendChild(box);
+        fetchRate();
+      }
+    }
+
+    class Chat extends Component {
+      mount() {
+        this.el.appendChild(sectionHead("Reader Ideas", "Drop your tip"));
+        this.el.appendChild(h("p", { style: "max-width:640px;margin:-16px 0 24px;color:rgba(26,28,37,.75)" },
+          "Anyone can post — no login. Restaurants, hidden gems, hotel reviews, pleas to add Hokkaido. Stored in your browser."));
+
+        const box = h("div", { class: "chat" });
+        const list = h("div", { class: "chat-list" });
+        box.appendChild(list);
+
+        const nameInput = h("input", { placeholder: "Your name", maxlength: "40" });
+        const msgInput  = h("textarea", { placeholder: "Share a tip, ask a question…", rows: "2", maxlength: "500" });
+        const submit    = h("button", {}, "Send");
+        const form = h("form", { class: "chat-form" }, nameInput, msgInput, submit);
+
+        const load = () => JSON.parse(localStorage.getItem("sakura.chat") || "[]");
+        const save = (arr) => localStorage.setItem("sakura.chat", JSON.stringify(arr));
+        const render = () => {
+          const msgs = load();
+          list.innerHTML = "";
+          if (!msgs.length) { list.appendChild(h("div", { class: "chat-empty" }, "No tips yet — be the first.")); return; }
+          msgs.slice().reverse().forEach(m => {
+            list.appendChild(h("div", { class: "chat-msg" },
+              h("div", { class: "chat-msg-head" },
+                h("span", {}, m.name || "Anonymous"),
+                h("span", {}, new Date(m.t).toLocaleString())
+              ),
+              h("div", { class: "chat-msg-body" }, m.body)
+            ));
+          });
+        };
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const body = msgInput.value.trim();
+          if (!body) return;
+          const msgs = load();
+          msgs.push({ name: nameInput.value.trim() || "Anonymous", body, t: Date.now() });
+          save(msgs);
+          msgInput.value = "";
+          render();
+        });
+        box.appendChild(form);
+        this.el.appendChild(box);
+        render();
+      }
+    }
+
+    class SiteFooter extends Component {
+      mount() {
+        this.el.appendChild(h("div", { class: "wrap" },
+          h("div", { class: "footer-grid" },
+            h("div", {},
+              h("div", { class: "brand" },
+                h("span", { class: "brand-mark" }, "桜"),
+                h("span", { class: "brand-name" }, "SAKURA DAYS")
+              ),
+              h("p", { style: "margin-top:12px;color:var(--muted);font-size:14px;max-width:380px" },
+                "Our shared planning hub for two weeks in Japan during cherry blossom season.")
+            ),
+            h("div", {},
+              h("h4", {}, "Plan"),
+              h("ul", {},
+                h("li", {}, h("a", { href: "#itinerary" }, "Itinerary")),
+                h("li", {}, h("a", { href: "#spots" }, "Hanami spots")),
+                h("li", {}, h("a", { href: "#plan" }, "Booking timeline")),
+              )
+            ),
+            h("div", {},
+              h("h4", {}, "Collaborate"),
+              h("ul", {},
+                h("li", {}, h("a", { href: DATA.googleDoc, target: "_blank", rel: "noopener" }, "Shared Google Doc")),
+                h("li", {}, h("a", { href: "#ideas" }, "Ideas board")),
+              )
+            ),
+          )
+        ));
+        this.el.appendChild(h("div", { class: "footer-end" }, `© ${new Date().getFullYear()} Sakura Days · Made for the trip`));
+      }
+    }
+
+    // ---- REGISTRY + BOOT -------------------------------------------------
+    const Registry = {
+      petals:     PetalsField,
+      navbar:     NavBar,
+      hero:       Hero,
+      itinerary:  Itinerary,
+      mustsee:    MustSee,
+      mapEmbed:   MapEmbed,
+      plan:       Plan,
+      shop:       Shop,
+      currency:   Currency,
+      chat:       Chat,
+      siteFooter: SiteFooter,
+    };
+
+    const App = {
+      boot() {
+        document.querySelectorAll("[data-component]").forEach(el => {
+          const name = el.getAttribute("data-component");
+          const Cls = Registry[name];
+          if (!Cls) { console.warn("Unknown component:", name); return; }
+          let props = {};
+          const raw = el.getAttribute("data-props");
+          if (raw) { try { props = JSON.parse(raw); } catch {} }
+          new Cls(el, props).mount();
+        });
+      }
+    };
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", App.boot);
+    else App.boot();
+
+    // Expose for extension from devtools or external scripts
+    window.SakuraApp = { Component, Registry, DATA, App };
+  })();
+  </script>
+</body>
 </html>
